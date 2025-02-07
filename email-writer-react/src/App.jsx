@@ -15,26 +15,26 @@ import { saveAs } from 'file-saver';
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#2C3E50', // Deep blue-gray
-            light: '#34495E',
-            dark: '#1B2631'
+            main: '#532190', // Deep blue-gray
+            light: '#3F248F',
+            dark: '#9E34B1'
         },
         secondary: {
-            main: '#3498DB', // Bright blue
-            light: '#5DADE2',
-            dark: '#2874A6'
+            main: '#52379F', // Bright blue
+            light: '#823BA0',
+            dark: '#842B94'
         },
         background: {
-            default: '#ECF0F1', // Light gray-blue
+            default: '#3498DB', // Light gray-blue
             paper: '#FFFFFF'
         },
         text: {
-            primary: '#2C3E50',
-            secondary: '#7F8C8D'
+            primary: '#283590',
+            secondary: '#000'
         }
     },
     typography: {
-        fontFamily: 'Inter, Arial, sans-serif',
+        fontFamily: 'Verdana',
         h4: {
             fontWeight: 700,
             letterSpacing: '-0.5px'
@@ -218,7 +218,7 @@ function App() {
                                     color="primary" 
                                     onClick={handleCopy}
                                 >
-                                    Copy
+                                    Copy To clipboard
                                 </Button>
                             </Box>
                         </CardContent>
