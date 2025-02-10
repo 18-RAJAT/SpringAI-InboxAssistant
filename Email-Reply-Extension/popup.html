@@ -1,119 +1,15 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Reply Assistant</title>
-    <style>
-        *
-        {
-            font-family: Arial, sans-serif;
-            color: #333;
-        }
-        body
-        {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
-            overflow-y: scroll;
-            scrollbar-width: thin;
-            scrollbar-color: #14d150 #f4f4f4;
-        }
-        body::-webkit-scrollbar
-        {
-            width: 12px;
-        }
-        body::-webkit-scrollbar-track
-        {
-            background: #f4f4f4;
-        }
-        body::-webkit-scrollbar-thumb
-        {
-            background: linear-gradient(180deg, #71dc14, #00d4ff);
-            border-radius: 6px;
-            position: relative;
-        }
-        .scroll-icon
-        {
-            position: fixed;
-            right: 2px;
-            top: 0;
-            width: 40px;
-            height: 40px;
-            /* background: url('https://cdn-icons-png.flaticon.com/512/732/732200.png') no-repeat center; */
-            background-size: contain;
-            transition: transform 0.2s;
-        }
-        .scroll-icon-mail
-        {
-            position: fixed;
-            right: 3px;
-            top: 10px;
-            width: 20px;
-            height: 30px;
-            background: url('https://cdn-icons-png.flaticon.com/512/732/732200.png') no-repeat center;
-            background-size: contain;
-            transition: transform 0.2s;
-        }
-        .container
-        {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            max-width: 450px;
-            margin: auto;
-        }
-        .title
-        {
-            color: #333;
-            font-size: 22px;
-            margin-bottom: 10px;
-        }
-        .description
-        {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        .features
-        {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-        }
-        .feature-item
-        {
-            background: #ff8800;
-            color: white;
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            text-align: center;
-            min-width: 120px;
-        }
-        .footer
-        {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #555;
-        }
-    </style>
-    <script>
-        document.addEventListener('scroll', function()
-        {
-            let scrollPosition=window.scrollY;
-            document.querySelector('.scroll-icon').style.transform=`translateY(${scrollPosition}px)`;
-            document.querySelector('.scroll-icon-mail').style.transform=`translateY(${scrollPosition}px)`;
-        });
-    </script>
+    <link rel="stylesheet" href="content.css">
 </head>
 <body>
     <div class="scroll-icon"></div>
-    <div class="scroll-icon-mail"></div>
+    <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank">
+        <div class="scroll-icon-mail"></div>
+    </a>
     <div class="container">
         <h2 class="title">📩 Email Reply Assistant</h2>
         <p class="description">Boost your productivity with AI-generated email responses. Save time and communicate effectively!</p>
@@ -127,5 +23,6 @@
         </div>
         <p class="footer">Enhance your email experience with intelligent assistance!</p>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>
