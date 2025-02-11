@@ -264,24 +264,27 @@ function createCharacterCounter()
 function createLoadingSpinner()
 {
     const spinner=document.createElement("div");
-    spinner.className="ai-spinner";  // Added class for easy removal
+    spinner.className="ai-spinner";
     spinner.style.display="inline-block";
-    spinner.style.width="16px";
-    spinner.style.height="16px";
-    spinner.style.marginLeft="8px";
-    spinner.style.border="2px solid #ffffff";
+    spinner.style.width="20px";
+    spinner.style.height="20px";
+    spinner.style.marginLeft="10px";
+    spinner.style.border="3px solid rgba(255, 255, 255, 0.3)";
     spinner.style.borderRadius="50%";
-    spinner.style.borderTopColor="transparent";
-    spinner.style.animation="spin 1s linear infinite";
+    spinner.style.borderTopColor="#007bff";
+    spinner.style.animation="spin 0.8s ease-in-out infinite";
+    spinner.style.boxShadow="0 0 8px rgba(0, 123, 255, 0.5)";
 
     const style=document.createElement("style");
-    style.textContent=`
-        @keyframes spin {
-            to {transform: rotate(360deg);}
+    style.textContent = `
+        @keyframes spin
+        {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+            100% { transform: rotate(360deg); }
         }
     `;
     document.head.appendChild(style);
-
     return spinner;
 }
 
