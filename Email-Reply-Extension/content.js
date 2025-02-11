@@ -1,36 +1,120 @@
-function createAIButton()
-{
-    const button=document.createElement("button");
-    button.className="ai-reply-button";
-    button.style.marginRight="12px";
-    button.style.padding="10px 20px";
-    button.style.borderRadius="6px";
-    button.style.backgroundColor="#1a73e8";
-    button.style.color="white";
-    button.style.fontWeight="500";
-    button.style.fontSize="14px";
-    button.style.cursor="pointer";
-    button.style.border="none";
-    button.style.transition="all 0.2s ease";
-    button.style.boxShadow="0 1px 2px rgba(0,0,0,0.1)";
-    button.innerHTML="AI Reply";
-    button.setAttribute("role","button");
-    button.disabled=false;  // Added initial state
+function createAIButton() {
+    const button = document.createElement("button");
+    button.className = "ai-reply-button";
+    button.style.marginRight = "12px";
+    button.style.padding = "10px 20px";
+    button.style.borderRadius = "6px";
+    button.style.backgroundColor = "#1a73e8";
+    button.style.color = "white";
+    button.style.fontWeight = "500";
+    button.style.fontSize = "14px";
+    button.style.cursor = "pointer";
+    button.style.border = "none";
+    button.style.transition = "all 0.2s ease";
+    button.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+    button.style.position = "relative"; // Added for better hover handling
+    button.style.zIndex = "1"; // Added for better hover handling
+    button.innerHTML = "AI Reply";
+    button.setAttribute("role", "button");
+    button.disabled = false;
 
-    button.addEventListener("mouseover",()=>{
-        if(!button.disabled) {
-            button.style.backgroundColor="#1557b0";
-            button.style.boxShadow="0 2px 4px rgba(0,0,0,0.15)";
+    button.addEventListener("mouseover", () => {
+        if (!button.disabled) {
+            button.style.backgroundColor = "#1557b0";
+            button.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
         }
     });
-    button.addEventListener("mouseout",()=>{
-        if(!button.disabled) {
-            button.style.backgroundColor="#1a73e8";
-            button.style.boxShadow="0 1px 2px rgba(0,0,0,0.1)";
+    button.addEventListener("mouseout", () => {
+        if (!button.disabled) {
+            button.style.backgroundColor = "#1a73e8";
+            button.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
         }
     });
 
     return button;
+}
+
+function createActionButtons(generatedText, composeBox, charCounter, aiButton) {
+    const actionContainer = document.createElement("div");
+    actionContainer.style.display = "flex";
+    actionContainer.style.alignItems = "center";
+    actionContainer.style.marginTop = "12px";
+    actionContainer.style.gap = "8px";
+    actionContainer.style.position = "relative"; // Added for better hover handling
+    actionContainer.style.zIndex = "1"; // Added for better hover handling
+
+    const acceptButton = document.createElement("button");
+    acceptButton.textContent = "Accept";
+    acceptButton.style.padding = "8px 20px";
+    acceptButton.style.borderRadius = "4px";
+    acceptButton.style.backgroundColor = "#1e8e3e";
+    acceptButton.style.color = "white";
+    acceptButton.style.border = "none";
+    acceptButton.style.cursor = "pointer";
+    acceptButton.style.fontWeight = "500";
+    acceptButton.style.fontSize = "14px";
+    acceptButton.style.transition = "all 0.2s ease";
+    acceptButton.style.position = "relative"; // Added for better hover handling
+    acceptButton.style.zIndex = "1"; // Added for better hover handling
+    acceptButton.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+
+    const rejectButton = document.createElement("button");
+    rejectButton.textContent = "Reject";
+    rejectButton.style.padding = "8px 20px";
+    rejectButton.style.borderRadius = "4px";
+    rejectButton.style.backgroundColor = "#d93025";
+    rejectButton.style.color = "white";
+    rejectButton.style.border = "none";
+    rejectButton.style.cursor = "pointer";
+    rejectButton.style.fontWeight = "500";
+    rejectButton.style.fontSize = "14px";
+    rejectButton.style.transition = "all 0.2s ease";
+    rejectButton.style.position = "relative"; // Added for better hover handling
+    rejectButton.style.zIndex = "1"; // Added for better hover handling
+    rejectButton.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+
+    acceptButton.addEventListener("mouseover", () => {
+        acceptButton.style.backgroundColor = "#137333";
+        acceptButton.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
+    });
+    acceptButton.addEventListener("mouseout", () => {
+        acceptButton.style.backgroundColor = "#1e8e3e";
+        acceptButton.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+    });
+
+    rejectButton.addEventListener("mouseover", () => {
+        rejectButton.style.backgroundColor = "#b31412";
+        rejectButton.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
+    });
+    rejectButton.addEventListener("mouseout", () => {
+        rejectButton.style.backgroundColor = "#d93025";
+        rejectButton.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+    });
+
+    acceptButton.addEventListener("click", () => {
+        if (composeBox) {
+            composeBox.innerHTML = generatedText;
+            updateCharacterCount(composeBox, charCounter);
+            showNotification("Reply accepted!");
+        }
+        actionContainer.remove();
+        aiButton.disabled = false;
+    });
+
+    rejectButton.addEventListener("click", () => {
+        if (composeBox) {
+            composeBox.innerHTML = "";
+            updateCharacterCount(composeBox, charCounter);
+        }
+        actionContainer.remove();
+        aiButton.disabled = false;
+        showNotification("Reply rejected. Generate a new one!", true);
+    });
+
+    actionContainer.appendChild(acceptButton);
+    actionContainer.appendChild(rejectButton);
+
+    return actionContainer;
 }
 
 function createToneSelector()
@@ -282,75 +366,476 @@ function updateCharacterCount(composeBox, counter)
     }
 }
 
-async function generateReply(emailContent, tone, language)
-{
-    const response=await fetch("http://localhost:9191/api/email/generate",
+
+async function generateReply(emailContent, tone, language) {
+    const response = await fetch("http://localhost:9191/api/email/generate",
         {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json",
+            method: "POST",
+            headers:
+            {
+                "Content-Type": "application/json",
             },
-            body:JSON.stringify({
+            body: JSON.stringify
+            ({
                 emailContent,
                 tone,
                 language,
-                maxLength: 2000 
+                maxLength: 2000,
+                targetLanguage:language
             })
-        }
-    );
+        });
 
     if(!response.ok)
-    {
+        {
+            throw new Error(`API request failed: ${response.statusText}`);
+        }
+
+    return response.text();
+}
+
+function createActionButtons(generatedText, composeBox, charCounter, aiButton) {
+    const actionContainer = document.createElement("div");
+    actionContainer.style.display = "flex";
+    actionContainer.style.alignItems = "center";
+    actionContainer.style.marginTop = "8px";
+    actionContainer.style.gap = "8px";
+
+    const acceptButton = document.createElement("button");
+    acceptButton.textContent = "Accept";
+    acceptButton.style.padding = "6px 16px";
+    acceptButton.style.borderRadius = "4px";
+    acceptButton.style.backgroundColor = "#1e8e3e";
+    acceptButton.style.color = "white";
+    acceptButton.style.border = "none";
+    acceptButton.style.cursor = "pointer";
+    acceptButton.style.fontWeight = "500";
+    acceptButton.style.fontSize = "14px";
+    acceptButton.style.transition = "background-color 0.2s";
+
+    const rejectButton = document.createElement("button");
+    rejectButton.textContent = "Reject";
+    rejectButton.style.padding = "6px 16px";
+    rejectButton.style.borderRadius = "4px";
+    rejectButton.style.backgroundColor = "#d93025";
+    rejectButton.style.color = "white";
+    rejectButton.style.border = "none";
+    rejectButton.style.cursor = "pointer";
+    rejectButton.style.fontWeight = "500";
+    rejectButton.style.fontSize = "14px";
+    rejectButton.style.transition = "background-color 0.2s";
+
+    acceptButton.addEventListener("mouseover", () => {
+        acceptButton.style.backgroundColor = "#137333";
+    });
+    acceptButton.addEventListener("mouseout", () => {
+        acceptButton.style.backgroundColor = "#1e8e3e";
+    });
+
+    rejectButton.addEventListener("mouseover", () => {
+        rejectButton.style.backgroundColor = "#b31412";
+    });
+    rejectButton.addEventListener("mouseout", () => {
+        rejectButton.style.backgroundColor = "#d93025";
+    });
+
+    acceptButton.addEventListener("click", () => {
+        if (composeBox) {
+            composeBox.innerHTML = generatedText;
+            updateCharacterCount(composeBox, charCounter);
+            showNotification("Reply accepted!");
+        }
+        actionContainer.remove();
+        aiButton.disabled = false;
+    });
+
+    rejectButton.addEventListener("click", () => {
+        if (composeBox) {
+            composeBox.innerHTML = "";
+            updateCharacterCount(composeBox, charCounter);
+        }
+        actionContainer.remove();
+        aiButton.disabled = false;
+        showNotification("Reply rejected. Generate a new one!", true);
+    });
+
+    actionContainer.appendChild(acceptButton);
+    actionContainer.appendChild(rejectButton);
+
+    return actionContainer;
+}
+
+async function generateReply(emailContent, tone, language)
+{
+    const response = await fetch("http://localhost:9191/api/email/generate",
+        {
+            method: "POST",
+            headers:
+            {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify
+            ({
+                emailContent,
+                tone,
+                language,
+                maxLength: 2000,
+                targetLanguage: language,
+                enforceLanguage: true
+            })
+    });
+
+    if (!response.ok) {
         throw new Error(`API request failed: ${response.statusText}`);
     }
 
     return response.text();
 }
 
-function injectButton()
-{
+function createActionButtons(generatedText, composeBox, charCounter, aiButton) {
+    const actionContainer = document.createElement("div");
+    actionContainer.style.display = "flex";
+    actionContainer.style.alignItems = "center";
+    actionContainer.style.gap = "8px";
+    actionContainer.style.marginTop = "12px";
+    actionContainer.style.marginLeft = "0"; //->>>L
+    actionContainer.style.position = "relative";
+    actionContainer.style.zIndex = "1";
+
+    const buttonStyles = {
+        padding: "8px 20px",
+        borderRadius: "4px",
+        border: "none",
+        cursor: "pointer",
+        fontWeight: "500",
+        fontSize: "14px",
+        transition: "all 0.2s ease",
+        position: "relative",
+        zIndex: "1",
+        boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+        height: "36px",
+        minWidth: "100px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        userSelect: "none",
+        webkitUserSelect: "none"
+    };
+
+    const acceptButton = document.createElement("button");
+    Object.assign(acceptButton.style, buttonStyles);
+    acceptButton.textContent = "Accept";
+    acceptButton.style.backgroundColor = "#1e8e3e";
+    acceptButton.style.color = "white";
+
+    const rejectButton = document.createElement("button");
+    Object.assign(rejectButton.style, buttonStyles);
+    rejectButton.textContent = "Reject";
+    rejectButton.style.backgroundColor = "#d93025";
+    rejectButton.style.color = "white";
+
+    const hoverEffects = (button, defaultColor, hoverColor) => {
+        button.addEventListener("mouseover", () => {
+            button.style.backgroundColor = hoverColor;
+            button.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
+        });
+        button.addEventListener("mouseout", () => {
+            button.style.backgroundColor = defaultColor;
+            button.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+        });
+    };
+
+    hoverEffects(acceptButton, "#1e8e3e", "#137333");
+    hoverEffects(rejectButton, "#d93025", "#b31412");
+
+    acceptButton.addEventListener("click", () => {
+        if (composeBox) {
+            composeBox.innerHTML = generatedText;
+            updateCharacterCount(composeBox, charCounter);
+            showNotification("Reply accepted!");
+        }
+        actionContainer.remove();
+        aiButton.disabled = false;
+    });
+
+    rejectButton.addEventListener("click",()=>
+        {
+        if (composeBox) {
+            composeBox.innerHTML = "";
+            updateCharacterCount(composeBox, charCounter);
+        }
+        actionContainer.remove();
+        aiButton.disabled = false;
+        showNotification("Reply rejected. Generate a new one!", true);
+    });
+
+    actionContainer.appendChild(acceptButton);
+    actionContainer.appendChild(rejectButton);
+
+    return actionContainer;
+}
+
+// function injectButton() {
+//     const existingButton = document.querySelector('.ai-reply-button');
+//     if (existingButton) existingButton.remove();
+
+//     const toolbar = findComposeToolbar();
+//     if (!toolbar) {
+//         console.log("Toolbar not found");
+//         return;
+//     }
+
+//     const container = document.createElement("div");
+//     container.style.display = "flex";
+//     container.style.flexDirection = "column";
+//     container.style.padding = "12px";
+//     container.style.backgroundColor = "#f8f9fa";
+//     container.style.margin = "8px 0";
+//     container.style.borderRadius = "8px";
+//     container.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+//     container.style.width = "100%";
+
+//     const controlsContainer = document.createElement("div");
+//     controlsContainer.style.display = "flex";
+//     controlsContainer.style.alignItems = "center";
+//     controlsContainer.style.gap = "12px";
+//     controlsContainer.style.width = "100%";
+//     controlsContainer.style.position = "relative";
+//     controlsContainer.style.zIndex = "1";
+
+//     const buttonContainer = document.createElement("div");
+//     buttonContainer.style.display = "flex";
+//     buttonContainer.style.gap = "12px";
+//     buttonContainer.style.alignItems = "center";
+
+//     const button = createAIButton();
+//     const toneSelector = createToneSelector();
+//     const languageSelector = createLanguageSelector();
+//     const charCounter = createCharacterCounter();
+
+//     button.style.minWidth = "120px";
+//     button.style.height = "36px";
+//     button.style.display = "flex";
+//     button.style.alignItems = "center";
+//     button.style.justifyContent = "center";
+
+//     button.addEventListener("click", async () => {
+//         if (button.disabled) return;
+
+//         try {
+//             button.disabled = true;
+//             button.innerHTML = "Generating reply...";
+//             const spinner = createLoadingSpinner();
+//             button.appendChild(spinner);
+
+//             const emailContent = getEmailContent();
+//             if (!emailContent) {
+//                 throw new Error("No email content found");
+//             }
+
+//             const generatedReply = await generateReply(
+//                 emailContent,
+//                 toneSelector.querySelector("select").value,
+//                 languageSelector.querySelector("select").value
+//             );
+
+//             const composeBox = document.querySelector("[role='textbox'][g_editable='true']");
+//             if (composeBox) {
+//                 composeBox.innerHTML = generatedReply;
+//                 updateCharacterCount(composeBox, charCounter);
+                
+//                 const actionButtons = createActionButtons(
+//                     generatedReply, 
+//                     composeBox, 
+//                     charCounter, 
+//                     button
+//                 );
+
+//                 // Remove any existing action buttons
+//                 const existingActionButtons = container.querySelector('.action-buttons-container');
+//                 if (existingActionButtons) {
+//                     existingActionButtons.remove();
+//                 }
+
+//                 // Add new action buttons
+//                 const actionButtonsContainer = document.createElement("div");
+//                 actionButtonsContainer.className = 'action-buttons-container';
+//                 actionButtonsContainer.style.display = "flex";
+//                 actionButtonsContainer.style.gap = "8px";
+//                 actionButtonsContainer.style.marginTop = "12px";
+//                 actionButtonsContainer.appendChild(actionButtons);
+//                 container.appendChild(actionButtonsContainer);
+//             } else {
+//                 throw new Error("Compose box not found");
+//             }
+//         } catch (error) {
+//             console.error("Error generating AI reply:", error);
+//             showNotification(error.message || "Failed to generate AI reply", true);
+//             button.disabled = false;
+//         } finally {
+//             const spinner = button.querySelector('.ai-spinner');
+//             if (spinner) spinner.remove();
+//             button.innerHTML = "Generate AI Reply";
+//         }
+//     });
+
+//     buttonContainer.appendChild(button);
+//     buttonContainer.appendChild(toneSelector);
+//     buttonContainer.appendChild(languageSelector);
+//     buttonContainer.appendChild(charCounter);
+
+//     controlsContainer.appendChild(buttonContainer);
+//     container.appendChild(controlsContainer);
+//     toolbar.insertBefore(container, toolbar.firstChild);
+
+//     const composeBox = document.querySelector("[role='textbox'][g_editable='true']");
+//     if (composeBox) {
+//         composeBox.addEventListener("input", () => updateCharacterCount(composeBox, charCounter));
+//         updateCharacterCount(composeBox, charCounter);
+//     }
+// }
+
+// function createActionButtons(generatedText, composeBox, charCounter, aiButton) {
+//     const actionContainer = document.createElement("div");
+//     actionContainer.style.display = "flex";
+//     actionContainer.style.gap = "8px";
+//     actionContainer.style.position = "relative";
+//     actionContainer.style.zIndex = "1";
+
+//     const buttonStyles = {
+//         padding: "8px 20px",
+//         borderRadius: "4px",
+//         border: "none",
+//         cursor: "pointer",
+//         fontWeight: "500",
+//         fontSize: "14px",
+//         transition: "all 0.2s ease",
+//         position: "relative",
+//         zIndex: "1",
+//         boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+//         height: "36px",
+//         minWidth: "100px",
+//         display: "flex",
+//         alignItems: "center",
+//         justifyContent: "center",
+//     };
+
+//     const acceptButton = document.createElement("button");
+//     Object.assign(acceptButton.style, buttonStyles);
+//     acceptButton.textContent = "Accept";
+//     acceptButton.style.backgroundColor = "#1e8e3e";
+//     acceptButton.style.color = "white";
+
+//     const rejectButton = document.createElement("button");
+//     Object.assign(rejectButton.style, buttonStyles);
+//     rejectButton.textContent = "Reject";
+//     rejectButton.style.backgroundColor = "#d93025";
+//     rejectButton.style.color = "white";
+
+//     const hoverEffects = (button, defaultColor, hoverColor) => {
+//         button.addEventListener("mouseover", () => {
+//             button.style.backgroundColor = hoverColor;
+//             button.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
+//         });
+//         button.addEventListener("mouseout", () => {
+//             button.style.backgroundColor = defaultColor;
+//             button.style.boxShadow = "0 1px 2px rgba(0,0,0,0.1)";
+//         });
+//     };
+
+//     hoverEffects(acceptButton, "#1e8e3e", "#137333");
+//     hoverEffects(rejectButton, "#d93025", "#b31412");
+
+//     acceptButton.addEventListener("click", () => {
+//         if (composeBox) {
+//             composeBox.innerHTML = generatedText;
+//             updateCharacterCount(composeBox, charCounter);
+//             showNotification("Reply accepted!");
+//         }
+//         actionContainer.remove();
+//         aiButton.disabled = false;
+//     });
+
+//     rejectButton.addEventListener("click", () => {
+//         if (composeBox) {
+//             composeBox.innerHTML = "";
+//             updateCharacterCount(composeBox, charCounter);
+//         }
+//         actionContainer.remove();
+//         aiButton.disabled = false;
+//         showNotification("Reply rejected. Generate a new one!", true);
+//     });
+
+//     actionContainer.appendChild(acceptButton);
+//     actionContainer.appendChild(rejectButton);
+
+//     return actionContainer;
+// }
+
+// // Rest of the code remains the same
+
+
+
+
+
+function injectButton(){
     const existingButton=document.querySelector('.ai-reply-button');
     if(existingButton)existingButton.remove();
 
     const toolbar=findComposeToolbar();
-    if(!toolbar)
-    {
+    if(!toolbar){
         console.log("Toolbar not found");
         return;
     }
 
     const container=document.createElement("div");
     container.style.display="flex";
-    container.style.alignItems="center";
-    container.style.padding="8px";
-    container.style.borderRadius="8px";
+    container.style.flexDirection="column";
+    container.style.padding="12px";
     container.style.backgroundColor="#f8f9fa";
     container.style.margin="8px 0";
+    container.style.borderRadius="8px";
+    container.style.boxShadow="0 1px 3px rgba(0,0,0,0.1)";
+    container.style.width="100%";
+
+    const controlsContainer=document.createElement("div");
+    controlsContainer.style.display="flex";
+    controlsContainer.style.alignItems="center";
+    controlsContainer.style.gap="12px";
+    controlsContainer.style.width="100%";
+    controlsContainer.style.position="relative";
+    controlsContainer.style.zIndex="1";
+
+    const buttonContainer=document.createElement("div");
+    buttonContainer.style.display="flex";
+    buttonContainer.style.gap="12px";
+    buttonContainer.style.alignItems="center";
 
     const button=createAIButton();
     const toneSelector=createToneSelector();
     const languageSelector=createLanguageSelector();
     const charCounter=createCharacterCounter();
 
+    button.style.minWidth="120px";
+    button.style.height="36px";
+    button.style.display="flex";
+    button.style.alignItems="center";
+    button.style.justifyContent="center";
+
     button.addEventListener("click",async()=>{
-        if(button.disabled) return;  // Prevent multiple clicks
+        if(button.disabled)return;
 
-        try
-        {
+        try{
             button.disabled=true;
-            const originalText=button.innerHTML;
-            button.innerHTML="Mail is being generated...";
+            button.innerHTML="Generating reply...";
             const spinner=createLoadingSpinner();
-
-            //update 1
-            // button.appendChild(spinner);
+            button.appendChild(spinner);
 
             const emailContent=getEmailContent();
-            if(!emailContent)
-            {
+            if(!emailContent){
                 throw new Error("No email content found");
             }
 
+            const recipientName=emailContent.split('\n')[0].replace('Dear ','').replace(',','').trim();
             const generatedReply=await generateReply(
                 emailContent,
                 toneSelector.querySelector("select").value,
@@ -358,48 +843,93 @@ function injectButton()
             );
 
             const composeBox=document.querySelector("[role='textbox'][g_editable='true']");
-            if(composeBox)
-            {
-                composeBox.focus();
-                document.execCommand("insertText",false,generatedReply);
-                showNotification("Reply generated successfully!");
-                updateCharacterCount(composeBox, charCounter);
-            }
-            else
-            {
+            if(composeBox){
+                const formattedEmail=generatedReply.split('\n').map(line=>{
+                    if(line.trim().length>0){
+                        return `<div style="margin:0;padding:0;text-align:left;">${line}</div>`;
+                    }
+                    return '<div style="margin:0;padding:0;height:14px;"></div>';
+                }).join('');
+
+                composeBox.innerHTML=formattedEmail;
+                updateCharacterCount(composeBox,charCounter);
+                
+                const actionButtons=createActionButtons(
+                    formattedEmail,
+                    composeBox,
+                    charCounter,
+                    button
+                );
+
+                const existingActionButtons=container.querySelector('.action-buttons-container');
+                if(existingActionButtons){
+                    existingActionButtons.remove();
+                }
+
+                const actionButtonsContainer=document.createElement("div");
+                actionButtonsContainer.className='action-buttons-container';
+                actionButtonsContainer.style.display="flex";
+                actionButtonsContainer.style.gap="8px";
+                actionButtonsContainer.style.marginTop="12px";
+                actionButtonsContainer.appendChild(actionButtons);
+                container.appendChild(actionButtonsContainer);
+            }else{
                 throw new Error("Compose box not found");
             }
-        }
-        catch(error)
-        {
-            console.error("Error generating AI reply:", error);
-            showNotification(error.message || "Failed to generate AI reply", true);
-        }
-        finally
-        {
-            // Remove spinner and restore button
-            const spinner=button.querySelector('.ai-spinner');
-            if(spinner) spinner.remove();
-            button.innerHTML=originalText;
+        }catch(error){
+            console.error("Error generating AI reply:",error);
+            showNotification(error.message||"Failed to generate AI reply",true);
             button.disabled=false;
+        }finally{
+            const spinner=button.querySelector('.ai-spinner');
+            if(spinner)spinner.remove();
+            button.innerHTML="Generate AI Reply";
         }
     });
 
-    container.appendChild(button);
-    container.appendChild(toneSelector);
-    container.appendChild(languageSelector);
-    container.appendChild(charCounter);
+    buttonContainer.appendChild(button);
+    buttonContainer.appendChild(toneSelector);
+    buttonContainer.appendChild(languageSelector);
+    buttonContainer.appendChild(charCounter);
 
+    controlsContainer.appendChild(buttonContainer);
+    container.appendChild(controlsContainer);
     toolbar.insertBefore(container,toolbar.firstChild);
 
     const composeBox=document.querySelector("[role='textbox'][g_editable='true']");
-    if(composeBox)
-    {
+    if(composeBox){
         composeBox.addEventListener("input",()=>updateCharacterCount(composeBox,charCounter));
         updateCharacterCount(composeBox,charCounter);
     }
 }
 
+async function generateReply(emailContent,tone,language)
+{
+    const response=await fetch("http://localhost:9191/api/email/generate",
+        {
+            method:"POST",
+            headers:
+            {
+                "Content-Type":"application/json",
+            },
+            body:JSON.stringify
+            ({
+                emailContent,
+                tone,
+                language,
+                maxLength:2000,
+                targetLanguage:language,
+                enforceLanguage:true,
+                format:"email"
+            })
+        });
+
+        if(!response.ok)
+        {
+            throw new Error(`API request failed: ${response.statusText}`);
+        }
+    return response.text();
+}
 // Improved observer with debouncing
 let debounceTimeout;
 const observer=new MutationObserver((mutations)=>{
